@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Hệ thống Quản lý Lương{% endblock %}</title>
+    <!-- Link CSS -->
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<body>
+    <!-- Header/Navigation Bar -->
+    <div class="header">
+        <p style="margin:0;">PAYROLL SYSTEM | 
+        </p>
+    </div>
+
+    <!-- Sidebar Area -->
+    <div class="sidebar">
+        {% block sidebar %}
+            <!-- Menu mặc định:-->
+            <a href="base_staff.html">Đăng nhập</a>
+        {% endblock %}
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="content">
+        {% block content %}
+            
+        {% endblock %}
+    </div>
+</body>
+</html>
