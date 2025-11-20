@@ -26,8 +26,7 @@ DROP TABLE IF EXISTS `fund`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `fund` (
   `fund_id` int NOT NULL,
-  `fund_name` varchar(100) NOT NULL,
-  `fund_amount` decimal(15,2) NOT NULL,
+  `fund_amount` decimal(15,2) DEFAULT NULL,
   PRIMARY KEY (`fund_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -38,7 +37,7 @@ CREATE TABLE `fund` (
 
 LOCK TABLES `fund` WRITE;
 /*!40000 ALTER TABLE `fund` DISABLE KEYS */;
-INSERT INTO `fund` VALUES (999,'Main Fund',5000000000.00);
+INSERT INTO `fund` VALUES (1,2000000000.00);
 /*!40000 ALTER TABLE `fund` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -51,11 +50,11 @@ DROP TABLE IF EXISTS `fundtransaction`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `fundtransaction` (
   `transaction_id` int NOT NULL,
-  `fund_id` int NOT NULL,
-  `admin_id` int NOT NULL,
-  `old_fund` decimal(15,2) NOT NULL,
-  `new_fund` decimal(15,2) NOT NULL,
-  `transaction_date` datetime NOT NULL,
+  `fund_id` int DEFAULT NULL,
+  `admin_id` int DEFAULT NULL,
+  `old_amount` decimal(15,2) DEFAULT NULL,
+  `new_amount` decimal(15,2) DEFAULT NULL,
+  `transaction_date` datetime DEFAULT NULL,
   PRIMARY KEY (`transaction_id`),
   KEY `fk_trans_fund_idx` (`fund_id`),
   KEY `fk_trans_admin_idx` (`admin_id`),
@@ -70,7 +69,7 @@ CREATE TABLE `fundtransaction` (
 
 LOCK TABLES `fundtransaction` WRITE;
 /*!40000 ALTER TABLE `fundtransaction` DISABLE KEYS */;
-INSERT INTO `fundtransaction` VALUES (9001,999,1,5000000000.00,4970000000.00,'2025-11-19 03:49:44');
+INSERT INTO `fundtransaction` VALUES (1,1,1,2000000000.00,1970000000.00,'2025-11-30 15:00:00');
 /*!40000 ALTER TABLE `fundtransaction` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -83,7 +82,7 @@ DROP TABLE IF EXISTS `leave`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `leave` (
   `leave_id` int NOT NULL,
-  `leave_date` date NOT NULL,
+  `leave_date` date DEFAULT NULL,
   PRIMARY KEY (`leave_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -94,7 +93,7 @@ CREATE TABLE `leave` (
 
 LOCK TABLES `leave` WRITE;
 /*!40000 ALTER TABLE `leave` DISABLE KEYS */;
-INSERT INTO `leave` VALUES (500,'2025-11-20');
+INSERT INTO `leave` VALUES (1,'2025-12-25');
 /*!40000 ALTER TABLE `leave` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -107,15 +106,15 @@ DROP TABLE IF EXISTS `leavedetail`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `leavedetail` (
   `detail_id` int NOT NULL,
-  `leave_id` int NOT NULL,
-  `staff_id` int NOT NULL,
+  `leave_id` int DEFAULT NULL,
+  `staff_id` int DEFAULT NULL,
   `reason` longtext,
-  `status` enum('pending','approved','rejected') NOT NULL,
+  `status` enum('Pending','Approved','Rejected') DEFAULT NULL,
   PRIMARY KEY (`detail_id`),
-  KEY `fk_leave_leave_idx` (`leave_id`),
-  KEY `fk_leave_staff_idx` (`staff_id`),
-  CONSTRAINT `fk_leave_leave` FOREIGN KEY (`leave_id`) REFERENCES `leave` (`leave_id`),
-  CONSTRAINT `fk_leave_staff` FOREIGN KEY (`staff_id`) REFERENCES `person` (`id`)
+  KEY `fk_detail_id_idx` (`leave_id`),
+  KEY `fk_detail_staff_idx` (`staff_id`),
+  CONSTRAINT `fk_detail_id` FOREIGN KEY (`leave_id`) REFERENCES `leave` (`leave_id`),
+  CONSTRAINT `fk_detail_staff` FOREIGN KEY (`staff_id`) REFERENCES `staffprofile` (`staff_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -125,7 +124,7 @@ CREATE TABLE `leavedetail` (
 
 LOCK TABLES `leavedetail` WRITE;
 /*!40000 ALTER TABLE `leavedetail` DISABLE KEYS */;
-INSERT INTO `leavedetail` VALUES (1,500,3,'Sick leave','approved');
+INSERT INTO `leavedetail` VALUES (1,1,2,'Xin nghỉ đi chơi Noel','Pending');
 /*!40000 ALTER TABLE `leavedetail` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -138,10 +137,12 @@ DROP TABLE IF EXISTS `person`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `person` (
   `id` int NOT NULL,
-  `username` varchar(150) NOT NULL,
-  `password` varchar(128) NOT NULL,
-  `start_date` date NOT NULL,
-  `role` enum('admin','staff') NOT NULL,
+  `username` varchar(150) DEFAULT NULL,
+  `password` varchar(150) DEFAULT NULL,
+  `start_date` date DEFAULT NULL,
+  `role` enum('Admin','Staff') DEFAULT NULL,
+  `gender` enum('Male','Female','Other') DEFAULT NULL,
+  `birth_date` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username_UNIQUE` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -153,7 +154,7 @@ CREATE TABLE `person` (
 
 LOCK TABLES `person` WRITE;
 /*!40000 ALTER TABLE `person` DISABLE KEYS */;
-INSERT INTO `person` VALUES (1,'admin_boss','123456','2023-01-01','admin'),(2,'staff_alex','123456','2023-06-15','staff'),(3,'staff_sarah','123456','2023-07-01','staff');
+INSERT INTO `person` VALUES (1,'admin_boss','123456','2020-01-01','Admin','Male','1990-05-20'),(2,'staff_alice','123456','2024-06-01','Staff','Female','2000-01-15'),(3,'staff_bob','123456','2024-07-01','Staff','Male','1995-11-05');
 /*!40000 ALTER TABLE `person` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -166,8 +167,8 @@ DROP TABLE IF EXISTS `salary`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `salary` (
   `salary_id` int NOT NULL,
-  `salary_rank` varchar(100) NOT NULL,
-  `amount` decimal(15,2) NOT NULL,
+  `rank` varchar(100) DEFAULT NULL,
+  `amount` decimal(15,2) DEFAULT NULL,
   `multiplier` float DEFAULT NULL,
   PRIMARY KEY (`salary_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -179,7 +180,7 @@ CREATE TABLE `salary` (
 
 LOCK TABLES `salary` WRITE;
 /*!40000 ALTER TABLE `salary` DISABLE KEYS */;
-INSERT INTO `salary` VALUES (101,'Junior',10000000.00,1),(102,'Senior',20000000.00,1.5);
+INSERT INTO `salary` VALUES (1,'Intern',5000000.00,1),(2,'Senior Dev',20000000.00,1.5);
 /*!40000 ALTER TABLE `salary` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -192,21 +193,21 @@ DROP TABLE IF EXISTS `salarychangehistory`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `salarychangehistory` (
   `history_id` int NOT NULL,
-  `staff_id` int NOT NULL,
-  `admin_id` int NOT NULL,
-  `salary_id` int NOT NULL,
+  `admin_id` int DEFAULT NULL,
+  `staff_id` int DEFAULT NULL,
+  `salary_id` int DEFAULT NULL,
   `old_amount` decimal(15,2) DEFAULT NULL,
-  `new_amount` decimal(15,2) NOT NULL,
+  `new_amount` decimal(15,2) DEFAULT NULL,
   `old_multiplier` float DEFAULT NULL,
   `new_multiplier` float DEFAULT NULL,
-  `change_date` datetime NOT NULL,
+  `change_date` datetime DEFAULT NULL,
   PRIMARY KEY (`history_id`),
-  KEY `fk_schistory_staff_idx` (`staff_id`),
-  KEY `fk_schistory_admin_idx` (`admin_id`),
-  KEY `fk_schistory_salary_idx` (`salary_id`),
-  CONSTRAINT `fk_schistory_admin` FOREIGN KEY (`admin_id`) REFERENCES `person` (`id`),
-  CONSTRAINT `fk_schistory_salary` FOREIGN KEY (`salary_id`) REFERENCES `salary` (`salary_id`),
-  CONSTRAINT `fk_schistory_staff` FOREIGN KEY (`staff_id`) REFERENCES `person` (`id`)
+  KEY `fk_history_admin_idx` (`admin_id`),
+  KEY `fk_history_staff_idx` (`staff_id`),
+  KEY `fk_history_salary_idx` (`salary_id`),
+  CONSTRAINT `fk_history_admin` FOREIGN KEY (`admin_id`) REFERENCES `person` (`id`),
+  CONSTRAINT `fk_history_salary` FOREIGN KEY (`salary_id`) REFERENCES `salary` (`salary_id`),
+  CONSTRAINT `fk_history_staff` FOREIGN KEY (`staff_id`) REFERENCES `staffprofile` (`staff_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -216,6 +217,7 @@ CREATE TABLE `salarychangehistory` (
 
 LOCK TABLES `salarychangehistory` WRITE;
 /*!40000 ALTER TABLE `salarychangehistory` DISABLE KEYS */;
+INSERT INTO `salarychangehistory` VALUES (1,1,2,2,5000000.00,20000000.00,1,1.5,'2025-12-01 09:00:00');
 /*!40000 ALTER TABLE `salarychangehistory` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -228,18 +230,18 @@ DROP TABLE IF EXISTS `salarypayment`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `salarypayment` (
   `payment_id` int NOT NULL,
-  `staff_id` int NOT NULL,
-  `admin_id` int NOT NULL,
-  `salary_id` int NOT NULL,
-  `total_amount` decimal(15,2) NOT NULL,
-  `payment_date` datetime NOT NULL,
+  `staff_id` int DEFAULT NULL,
+  `admin_id` int DEFAULT NULL,
+  `total_amount` decimal(15,2) DEFAULT NULL,
+  `payment_date` datetime DEFAULT NULL,
+  `salary_id` int DEFAULT NULL,
   PRIMARY KEY (`payment_id`),
-  KEY `fk_pay_staff_idx` (`staff_id`),
-  KEY `fk_pay_admin_idx` (`admin_id`),
-  KEY `fk_pay_salary_idx` (`salary_id`),
-  CONSTRAINT `fk_pay_admin` FOREIGN KEY (`admin_id`) REFERENCES `person` (`id`),
-  CONSTRAINT `fk_pay_salary` FOREIGN KEY (`salary_id`) REFERENCES `salary` (`salary_id`),
-  CONSTRAINT `fk_pay_staff` FOREIGN KEY (`staff_id`) REFERENCES `person` (`id`)
+  KEY `fk_payment_admin_idx` (`admin_id`),
+  KEY `fk_payment_staff_idx` (`staff_id`),
+  KEY `fk_payment_salary_idx` (`salary_id`),
+  CONSTRAINT `fk_payment_admin` FOREIGN KEY (`admin_id`) REFERENCES `person` (`id`),
+  CONSTRAINT `fk_payment_salary` FOREIGN KEY (`salary_id`) REFERENCES `salary` (`salary_id`),
+  CONSTRAINT `fk_payment_staff` FOREIGN KEY (`staff_id`) REFERENCES `staffprofile` (`staff_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -249,7 +251,7 @@ CREATE TABLE `salarypayment` (
 
 LOCK TABLES `salarypayment` WRITE;
 /*!40000 ALTER TABLE `salarypayment` DISABLE KEYS */;
-INSERT INTO `salarypayment` VALUES (8001,2,1,102,30000000.00,'2025-11-19 03:49:44');
+INSERT INTO `salarypayment` VALUES (1,3,1,30000000.00,'2025-11-30 15:00:00',2);
 /*!40000 ALTER TABLE `salarypayment` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -262,15 +264,15 @@ DROP TABLE IF EXISTS `staffmanagement`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `staffmanagement` (
   `manage_id` int NOT NULL,
-  `admin_id` int NOT NULL,
-  `staff_id` int NOT NULL,
-  `action` varchar(50) NOT NULL,
-  `timestamp` datetime NOT NULL,
+  `admin_id` int DEFAULT NULL,
+  `staff_id` int DEFAULT NULL,
+  `action` varchar(100) DEFAULT NULL,
+  `timestamp` datetime DEFAULT NULL,
   PRIMARY KEY (`manage_id`),
   KEY `fk_manage_admin_idx` (`admin_id`),
   KEY `fk_manage_staff_idx` (`staff_id`),
   CONSTRAINT `fk_manage_admin` FOREIGN KEY (`admin_id`) REFERENCES `person` (`id`),
-  CONSTRAINT `fk_manage_staff` FOREIGN KEY (`staff_id`) REFERENCES `person` (`id`)
+  CONSTRAINT `fk_manage_staff` FOREIGN KEY (`staff_id`) REFERENCES `staffprofile` (`staff_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -280,6 +282,7 @@ CREATE TABLE `staffmanagement` (
 
 LOCK TABLES `staffmanagement` WRITE;
 /*!40000 ALTER TABLE `staffmanagement` DISABLE KEYS */;
+INSERT INTO `staffmanagement` VALUES (1,1,2,'thêm','2024-06-01 08:00:00'),(2,1,3,'thêm','2024-07-01 08:00:00');
 /*!40000 ALTER TABLE `staffmanagement` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -292,12 +295,10 @@ DROP TABLE IF EXISTS `staffprofile`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `staffprofile` (
   `staff_id` int NOT NULL,
-  `salary_id` int NOT NULL,
-  `gender` enum('male','female') DEFAULT NULL,
-  `birth_date` date DEFAULT NULL,
+  `salary_id` int DEFAULT NULL,
   PRIMARY KEY (`staff_id`),
   KEY `fk_staff_salary_idx` (`salary_id`),
-  CONSTRAINT `fk_staff_person` FOREIGN KEY (`staff_id`) REFERENCES `person` (`id`),
+  CONSTRAINT `fk_staff_id` FOREIGN KEY (`staff_id`) REFERENCES `person` (`id`),
   CONSTRAINT `fk_staff_salary` FOREIGN KEY (`salary_id`) REFERENCES `salary` (`salary_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -308,7 +309,7 @@ CREATE TABLE `staffprofile` (
 
 LOCK TABLES `staffprofile` WRITE;
 /*!40000 ALTER TABLE `staffprofile` DISABLE KEYS */;
-INSERT INTO `staffprofile` VALUES (2,102,'male','1995-05-20'),(3,101,'female','1998-11-10');
+INSERT INTO `staffprofile` VALUES (2,1),(3,2);
 /*!40000 ALTER TABLE `staffprofile` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -321,4 +322,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-19  4:00:20
+-- Dump completed on 2025-11-19 18:33:54

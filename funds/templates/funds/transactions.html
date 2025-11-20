@@ -1,0 +1,44 @@
+{% extends "base_admin.html" %}
+
+{% block admin_content %}
+<h2>Danh sách giao dịch Quỹ</h2>
+
+{% if messages %}
+  <ul>
+    {% for message in messages %}
+      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% if transactions %}
+<table border="1" cellpadding="6" cellspacing="0">
+  <thead>
+    <tr>
+      <th>Transaction ID</th>
+      <th>Fund ID</th>
+      <th>Admin ID</th>
+      <th>Số dư trước</th>
+      <th>Số dư sau</th>
+      <th>Thời gian</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for t in transactions %}
+    <tr>
+      <td>{{ t.transaction_id }}</td>
+      <td>{{ t.fund_id }}</td>
+      <td>{{ t.admin_id }}</td>
+      <td>{% if t.old_amount %}{{ t.old_amount|floatformat:2 }}{% else %}-{% endif %}</td>
+      <td>{% if t.new_amount %}{{ t.new_amount|floatformat:2 }}{% else %}-{% endif %}</td>
+      <td>{{ t.transaction_date }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+  <p>Không có giao dịch nào.</p>
+{% endif %}
+
+<p><a href="{% url 'funds:index' %}" class="link_button">Quay lại Quản lý Quỹ</a></p>
+{% endblock %}

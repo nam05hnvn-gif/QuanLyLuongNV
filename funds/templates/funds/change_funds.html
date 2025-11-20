@@ -1,0 +1,63 @@
+{% extends "base_admin.html" %}
+
+{% block admin_content %}
+<h2>Cập nhật Quỹ</h2>
+
+{% if messages %}
+  <ul>
+    {% for message in messages %}
+      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    
+    <p>
+        <strong>Fund ID:</strong> {{ fund.fund_id }}
+        <input type="hidden" name="fund_id" value="{{ fund.fund_id }}">
+    </p>
+
+    <p>
+        <strong>Số dư hiện tại:</strong>
+        {% if fund.fund_amount %}
+            {{ fund.fund_amount }}
+        {% endif %}
+    </p>
+
+    <p>
+        <label>Loại giao dịch:</label><br>
+        <input type="radio" name="transaction_type" value="nap" id="nap" required onchange="updateLabel()">
+        <label for="nap">Nạp tiền</label>
+        
+        <input type="radio" name="transaction_type" value="rut" id="rut" onchange="updateLabel()">
+        <label for="rut">Rút tiền</label>
+    </p>
+
+    <p>
+        <label for="amount" id="amount_label">Số tiền:</label><br>
+        <input type="number" name="amount" id="amount" step="0.01" required placeholder="Nhập số tiền">
+    </p>
+
+    <p>
+        <button type="submit">Cập nhật</button>
+        <a href="{% url 'funds:index' %}" class="link_button">Quay lại</a>
+    </p>
+</form>
+
+    <script>
+        function updateLabel() {
+            const napRadio = document.getElementById('nap');
+            const rutRadio = document.getElementById('rut');
+            const label = document.getElementById('amount_label');
+            
+            if (napRadio.checked) {
+                label.textContent = 'Số tiền nạp:';
+            } else if (rutRadio.checked) {
+                label.textContent = 'Số tiền rút:';
+            }
+        }
+    </script>
+
+{% endblock %}

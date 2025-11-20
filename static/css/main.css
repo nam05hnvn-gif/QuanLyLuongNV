@@ -67,7 +67,6 @@ body {
 
 /* FORM AND BUTTONS */
 form {
-    background: white;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
@@ -85,18 +84,24 @@ input[type="text"], input[type="password"], input[type="date"], select, textarea
     box-sizing: border-box;
 }
 
+.link_button {
+    cursor: pointer;
+    text-align: center;
+}
+
 /* Styling cho nút bấm */
-button {
-    background-color: #28a745; 
+button, .link_button {
+    all: unset;
+    display: inline-block;
+    background-color: #28a745;
     color: white;
     padding: 12px 20px;
-    border: none;
     border-radius: 4px;
-    cursor: pointer;
     font-size: 16px;
+    cursor: pointer;
     transition: background-color 0.3s;
 }
 
-button:hover {
+button:hover, .link_button:hover {
     background-color: #218838;
 }

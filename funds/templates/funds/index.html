@@ -1,0 +1,58 @@
+{% extends "base_admin.html" %}
+
+{% block admin_content %}
+<h2>Quản lý Quỹ</h2>
+
+{% if messages %}
+  <ul>
+    {% for message in messages %}
+      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<p>
+    <a href="{% url 'funds:add_funds' %}" style="text-decoration: none">Thêm quỹ mới</a> |
+    <a href="{% url 'funds:view_transactions' %}" style="text-decoration: none">Xem lịch sử giao dịch</a>
+</p>
+
+{% if funds %}
+<table border="1" cellpadding="6" cellspacing="0">
+    <thead>
+        <tr>
+            <th>Fund ID</th>
+            <th>Số dư</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for fund in funds %}
+        <tr>
+            <td>{{fund.fund_id}}</td>
+
+            <td>
+                {% if fund.fund_amount %}
+                    {{ fund.fund_amount }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+
+            <td>
+                <a href="{% url 'funds:change_funds' fund.fund_id %}" class="link_button">
+                    Giao dịch
+                </a>
+
+                <form action="{% url 'funds:delete_funds' fund.fund_id %}" method="post" style="display:inline">
+                    {% csrf_token %}
+                    <button type="submit" onclick="return confirm('Bạn có chắc muốn xóa quỹ này?');">Xóa quỹ</button>
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+    <p>Không có quỹ nào.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base_admin.html" %}
+
+{% block admin_content %}
+<h2>Thêm Quỹ Mới</h2>
+
+{% if messages %}
+  <ul>
+    {% for message in messages %}
+      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<form method="post" action="{% url 'funds:add_funds' %}">
+  {% csrf_token %}
+  <p>
+    <label for="fund_id">Fund ID:</label><br>
+    <input type="number" name="fund_id" id="fund_id" required value="{{ fund_id|default:'' }}">
+  </p>
+
+  <p>
+    <label for="fund_amount">Số dư ban đầu:</label><br>
+    <input type="number" name="fund_amount" id="fund_amount" step="0.01" required value="{{ fund_amount|default:'0.00' }}">
+  </p>
+
+  <p>
+    <button type="submit">Thêm quỹ</button>
+    <a href="{% url 'funds:index' %}" class="link_button">Hủy / Quay lại</a>
+  </p>
+</form>
+{% endblock %}
