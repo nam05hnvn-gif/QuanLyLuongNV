@@ -1,0 +1,8 @@
+# Python Bytecode Files
+*.pyc
+__pycache__/
+
+# Thư mục môi trường ảo (Virtual Environment)
+# Bạn cũng nên thêm thư mục môi trường ảo (thường là .venv hoặc venv)
+.venv/
+venv/
