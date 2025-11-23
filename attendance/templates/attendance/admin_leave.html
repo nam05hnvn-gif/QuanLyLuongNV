@@ -1,0 +1,92 @@
+{% extends "base_admin.html" %}
+
+
+{% block admin_content %}
+<div class="container mt-3">
+
+
+    <h3 class="mb-4">Duyệt yêu cầu nghỉ phép</h3>
+    <div class="card shadow-sm mb-5">
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Nhân viên</th>
+                        <th>Ngày nghỉ</th>
+                        <th>Lý do</th>
+                        <th>Trạng thái</th>
+                        <th>Duyệt</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in details %}
+                    <tr>
+                        <td>{{ d.staff_name }}</td>
+                        <td>{{ d.leave_date }}</td>
+                        <td>{{ d.reason }}</td>
+                        <td>
+                            {% if d.status == "Approved" %}
+                                <span class="badge bg-success">Đã duyệt</span>
+                            {% elif d.status == "Rejected" %}
+                                <span class="badge bg-danger">Từ chối</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">Chờ duyệt</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form method="post" class="d-flex gap-2">
+                                {% csrf_token %}
+                                <input type="hidden" name="detail_id" value="{{ d.detail_id }}">
+                                <button type="submit" name="status" value="approve" class="btn btn-success btn-sm">Duyệt</button>
+                                <button type="submit" name="status" value="reject" class="btn btn-danger btn-sm">Từ chối</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">Không có yêu cầu nào.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <h3 class="mb-4">Bảng tính lương nhân viên</h3>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-bordered table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nhân viên</th>
+                        <th>Đi làm</th>
+                        <th>Nghỉ phép</th>
+                        <th>Vắng</th>
+                        <th>Lương</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in results %}
+                    <tr>
+                        <td>{{ s.name }}</td>
+                        <td>{{ s.present }}</td>
+                        <td>{{ s.leave }}</td>
+                        <td>{{ s.absent }}</td>
+                        <td>{{ s.salary_formatted }} VND</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">Không có dữ liệu.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+</div>
+{% endblock %}
+
+

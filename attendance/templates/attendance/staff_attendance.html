@@ -1,0 +1,52 @@
+{% extends "base_staff.html" %}
+
+{% block staff_content %}
+<div class="container mt-4 text-center">
+
+    <!-- Thông báo chấm công thành công -->
+    {% if checked_in %}
+    <div class="alert alert-success">
+        <h4>Chấm công thành công!</h4>
+        <p>Ngày: {{ today }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Form check-in -->
+    <form method="post" class="mb-4">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Check-in hôm nay</button>
+    </form>
+
+    <!-- Lịch làm việc -->
+    <h3 class="mb-3">Lịch làm việc của bạn</h3>
+
+    <table class="table table-bordered table-striped shadow-sm">
+        <thead class="table-primary">
+            <tr>
+                <th>Ngày</th>
+                <th>Trạng thái</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in records %}
+            <tr>
+                <td>{{ r.date }}</td>
+                <td>
+                    {% if r.status == "present" %}
+                        <span class="badge bg-success">Đi làm</span>
+                    {% elif r.status == "leave" %}
+                        <span class="badge bg-info">Nghỉ phép</span>
+                    {% elif r.status == "absent" %}
+                        <span class="badge bg-danger">Vắng</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2" class="text-center">Không có dữ liệu</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
