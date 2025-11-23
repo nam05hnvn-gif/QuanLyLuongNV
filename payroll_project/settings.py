@@ -81,7 +81,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'payroll_db',  # Tên DB trong Workbench
         'USER': 'root',        # User MySQL
-        'PASSWORD': 'Duy10062005@',  # <--- Nhập mật khẩu MySQL vào đây
+        'PASSWORD': '123456',  # <--- Nhập mật khẩu MySQL vào đây
         'HOST': '127.0.0.1',  
         'PORT': '3306',
     }

@@ -16,6 +16,26 @@
     <a href="{% url 'funds:view_transactions' %}" style="text-decoration: none">Xem lịch sử giao dịch</a>
 </p>
 
+<form method="get">
+    <label for="search">Tìm kiếm:</label>
+    <input type="text" name="search" placeholder="Search..." value="{{ search }}">
+
+    <label for="sort">Sort theo:</label>
+    <select name="sort">
+        <option value="fund_id"     {% if sort == 'fund_id' %}selected{% endif %}>Fund_ID</option>
+        <option value="fund_amount" {% if sort == 'fund_amount' %}selected{% endif %}>Số dư</option>
+    </select>
+
+    <label for="order">Thứ tự:</label>
+    <select name="order">
+        <option value="asc"  {% if order == 'asc' %}selected{% endif %}>Tăng dần</option>
+        <option value="desc" {% if order == 'desc' %}selected{% endif %}>Giảm dần</option>
+    </select>
+
+    <button type="submit">Áp dụng</button>
+</form>
+
+
 {% if funds %}
 <table border="1" cellpadding="6" cellspacing="0">
     <thead>
