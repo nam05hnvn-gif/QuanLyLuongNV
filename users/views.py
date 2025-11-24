@@ -9,7 +9,7 @@ def index(request):
         if role == 'Admin':
             return redirect('users:admin_dashboard')
         else:
-            return redirect('users:profile')      
+            return redirect('users:staff_dashboard')      
     
     return redirect('users:login')
 
@@ -36,7 +36,7 @@ def login_view(request):
                 if role == 'Admin':
                     return redirect('users:admin_dashboard')
                 else:
-                    return redirect('users:profile') 
+                    return redirect('users:staff_dashboard') 
         
         error = 'Tên đăng nhập hoặc mật khẩu không hợp lệ.'
         return render(request, 'login.html', {'error': error})
@@ -250,3 +250,65 @@ def profile_view(request):
     }
 
     return render(request, 'profile.html', context)
+
+def edit_profile_view(request):
+    if 'user_id' not in request.session:
+         return redirect('users:login') 
+
+    person_id = request.session['user_id']
+    
+    if request.method == 'POST':
+        new_username = request.POST.get('username')
+        new_gender = request.POST.get('gender')
+        new_birth_date = request.POST.get('birth_date')
+        
+        # Kiểm tra tính hợp lệ của ngày sinh
+        try:
+            datetime.strptime(new_birth_date, '%Y-%m-%d').date() 
+        except ValueError:
+            error = 'Định dạng ngày sinh không hợp lệ.'
+            return render(request, 'edit_profile.html', {'error': error})
+        
+        try:
+            with connection.cursor() as cursor:
+                update_query = """
+                    UPDATE person 
+                    SET username = %s, gender = %s, birth_date = %s
+                    WHERE id = %s
+                """
+                cursor.execute(update_query, [
+                    new_username, 
+                    new_gender, 
+                    new_birth_date, 
+                    person_id
+                ])
+                
+            return redirect('users:profile') 
+
+        except Exception as e:
+            error = f"Lỗi khi cập nhật hồ sơ: {e}"
+            return render(request, 'edit_profile.html', {'error': error, 'current_data': request.POST})
+
+    # --- Hiển thị Form hiện tại (GET) ---
+    try:
+        with connection.cursor() as cursor:
+            # Lấy dữ liệu profile hiện tại
+            query = """
+                SELECT id, username, gender, birth_date 
+                FROM person 
+                WHERE id = %s
+            """
+            cursor.execute(query, [person_id])
+            row = cursor.fetchone()
+            
+            if row:
+                columns = [col[0] for col in cursor.description]
+                profile_data = dict(zip(columns, row))
+            else:
+                profile_data = None
+                
+    except Exception as e:
+        print(f"Database Error: {e}")
+        profile_data = None
+
+    return render(request, 'edit_profile.html', {'profile': profile_data})

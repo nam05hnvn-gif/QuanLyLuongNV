@@ -40,7 +40,7 @@
             <p style="color: red;">Không thể tải dữ liệu hồ sơ cá nhân. Vui lòng thử lại.</p>
         {% endif %}
 
-        <a href="#" style="background-color: #007bff; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; margin-top: 20px; display: inline-block;">
+        <a href="{% url 'users:edit_profile' %}" style="background-color: #007bff; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; margin-top: 20px; display: inline-block;">
             Chỉnh sửa Hồ sơ
         </a>
     </div>
