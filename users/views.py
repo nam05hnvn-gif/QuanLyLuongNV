@@ -174,6 +174,140 @@ def add_staff_view(request):
 
     return render(request, 'add_staff.html', {})
 
+def admin_edit_staff_view(request, staff_id):
+    if 'user_id' not in request.session or request.session.get('user_role') != 'Admin':
+        return redirect('users:login')
+    
+    admin_id = request.session['user_id']
+    staff_data = None # Khai báo để có scope toàn cục trong hàm
+    
+    # Lấy danh sách bậc lương có sẵn
+    salary_ranks = []
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT salary_id, rank, amount FROM salary ORDER BY CAST(salary_id AS UNSIGNED)")
+            salary_ranks = [dict(zip([col[0] for col in cursor.description], row)) for row in cursor.fetchall()]
+    except Exception as e:
+        print(f"Lỗi truy vấn bậc lương: {e}")
+
+    try:
+        with connection.cursor() as cursor:
+            # JOIN 4 bảng person, staffprofile, salary
+            query = """
+                SELECT 
+                    p.id, p.username, p.gender, p.birth_date, p.start_date,
+                    sp.salary_id, s.rank
+                FROM person p
+                JOIN staffprofile sp ON p.id = sp.staff_id
+                JOIN salary s ON sp.salary_id = s.salary_id
+                WHERE p.id = %s
+            """
+            cursor.execute(query, [staff_id])
+            row = cursor.fetchone()
+            
+            if row:
+                columns = [col[0] for col in cursor.description]
+                staff_data = dict(zip(columns, row))
+            
+    except Exception as e:
+        print(f"Database Error: {e}")
+        staff_data = None
+
+    # =================================================================================
+
+    if request.method == 'POST':
+        new_username   = request.POST.get('username')
+        new_gender     = request.POST.get('gender')
+        new_birth_date = request.POST.get('birth_date')
+        new_salary_id  = request.POST.get('salary_id')
+        
+        # Check lỗi Ngày sinh
+        try:
+            datetime.strptime(new_birth_date, '%Y-%m-%d').date() 
+        except ValueError:
+            context = {
+                'staff': staff_data,
+                'error': 'Định dạng ngày sinh không hợp lệ.', 
+                'salary_ranks': salary_ranks
+            }
+            return render(request, 'admin_edit_staff.html', context)
+
+        try:
+            with transaction.atomic():
+                with connection.cursor() as cursor:
+                    cursor.execute("SELECT salary_id FROM staffprofile WHERE staff_id = %s", [staff_id])
+                    old_salary_id = cursor.fetchone()[0]
+
+                    # Cập nhật Person
+                    person_query = """
+                        UPDATE person 
+                        SET username = %s, gender = %s, birth_date = %s
+                        WHERE id = %s
+                    """
+                    cursor.execute(person_query, [
+                        new_username, new_gender, new_birth_date, staff_id
+                    ])
+
+                    # Cập nhật StaffProfile và ghi Log
+                    if str(old_salary_id) != str(new_salary_id):
+                        # Lấy lương cũ 
+                        cursor.execute(
+                            "SELECT amount, multiplier FROM salary WHERE salary_id = %s",
+                            [old_salary_id]
+                        )
+                        old_amount, old_multiplier = cursor.fetchone()
+
+                        # Lấy lương mới
+                        cursor.execute(
+                            "SELECT amount, multiplier FROM salary WHERE salary_id = %s",
+                            [new_salary_id]
+                        )
+                        new_amount, new_multiplier = cursor.fetchone()
+
+                        staff_profile_query = """
+                            UPDATE staffprofile 
+                            SET salary_id = %s
+                            WHERE staff_id = %s
+                        """
+                        cursor.execute(staff_profile_query, [new_salary_id, staff_id])
+
+                        # Ghi Log
+                        cursor.execute("SELECT MAX(history_id) FROM salarychangehistory")
+                        max_history_id = cursor.fetchone()[0]
+                        new_history_id = max_history_id + 1 if max_history_id is not None else 1
+
+                        history_query = """
+                            INSERT INTO salarychangehistory (history_id, admin_id, staff_id, salary_id, old_amount, new_amount, old_multiplier, new_multiplier, change_date)
+                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        """
+                        cursor.execute(history_query, [
+                            new_history_id, 
+                            admin_id, staff_id, new_salary_id,
+                            old_amount, new_amount,
+                            old_multiplier, new_multiplier,
+                            datetime.now()
+                        ])
+                        
+            return redirect('users:list_staff') 
+
+        except Exception as e:
+            error = f"Lỗi khi cập nhật nhân viên: {e}"
+            context = {
+                'staff': staff_data,
+                'error': error, 
+                'salary_ranks': salary_ranks
+            }
+            return render(request, 'admin_edit_staff.html', context)
+
+    # --- Hiển thị Form hiện tại (GET) ---
+    context = {
+        'staff': staff_data,
+        'salary_ranks': salary_ranks,
+        'error': 'Không tìm thấy hồ sơ nhân viên này.' if staff_data is None else None
+    }
+    
+    return render(request, 'admin_edit_staff.html', context)
+
 def delete_staff_view(request, staff_id):
     if 'user_id' not in request.session or request.session.get('user_role') != 'Admin':
         return redirect('users:login')

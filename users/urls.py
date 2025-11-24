@@ -24,7 +24,7 @@ urlpatterns = [
     path('admin/staffs/', views.list_staff_view, name='list_staff'),
     path('admin/staffs/add/', views.add_staff_view, name='add_staff'),
     path('admin/staffs/delete/<str:staff_id>/', views.delete_staff_view, name='delete_staff'), 
-    # path('admin/staffs/edit/<str:staff_id>/', views.admin_edit_staff_view, name='admin_edit_staff'),
+    path('admin/staffs/edit/<str:staff_id>/', views.admin_edit_staff_view, name='admin_edit_staff'),
 
     # STAFF FEATURES 
     path('staff/', views.staff_dashboard, name='staff_dashboard'), 
