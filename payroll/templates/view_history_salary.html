@@ -3,26 +3,25 @@
 {% block title %}Xem lịch sử thay đổi luong{% endblock %}
 
 {% block content %}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<div class="container mt-4">
+<div>
 
-    <h3 class="mb-3"> Lịch sử thay đổi lương</h3>
+    <h3>Lịch sử thay đổi lương</h3>
 
-    <a href="{% url 'payroll:view_salary' %}" class="btn btn-outline-dark">
-        ← Quay lại danh sách lương
-    </a>
+    <a href="{% url 'payroll:view_salary' %}">← Quay lại danh sách lương</a>
+
     <form method="post">
-         {% csrf_token %}
-    <div class="d-flex justify-content-end mb-3 gap-2">
-        <input type="hidden" name="history_id" id="history_id">
-        <button type="submit" class="btn btn-outline-dark">Xóa</button>
-    </div>
+        {% csrf_token %}
+        <div>
+            <input type="hidden" name="history_id" id="history_id">
+            <button type="submit">Xóa</button>
+        </div>
     </form>
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <table class="table table-bordered table-striped align-middle">
-                <thead class="table-dark">
+
+    <div>
+        <div>
+            <table border="1" cellspacing="0" cellpadding="5">
+                <thead>
                     <tr>
                         <th></th>
                         <th>Thứ tự</th>
@@ -36,7 +35,7 @@
                 <tbody>
                     {% for h in histories %}
                     <tr class="clickable-row">
-                        <td><input type="radio" name="history_id" value={{ h.history_id }}></td>
+                        <td><input type="radio" name="history_id" value="{{ h.history_id }}"></td>
                         <td>{{ forloop.counter }}</td>
                         <td>{{ h.salary_id }}</td>
                         <td>{{ h.old_rank }} -> {{ h.new_rank }}</td>
@@ -46,17 +45,16 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="9" class="text-center text-muted">
-                            Không có lịch sử thay đổi nào.
-                        </td>
+                        <td colspan="9">Không có lịch sử thay đổi nào.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-
         </div>
     </div>
+
 </div>
+
 <script>
 // Khi click vào <tr>, check radio bên trong
 document.querySelectorAll('.clickable-row').forEach(row => {
@@ -67,13 +65,17 @@ document.querySelectorAll('.clickable-row').forEach(row => {
             radio.checked = true;
         }
 
-        // Thêm class tô màu cho dòng được chọn
+        // Bỏ màu các dòng khác
         document.querySelectorAll('.clickable-row').forEach(r => r.classList.remove('table-primary'));
+
+        // Tô màu dòng đang chọn
         this.classList.add('table-primary');
 
+        // Gán ID vào input hidden để gửi form
         const selectedId = this.querySelector('input[type="radio"]').value;
         document.getElementById('history_id').value = selectedId;
     });
 });
 </script>
+
 {% endblock %}

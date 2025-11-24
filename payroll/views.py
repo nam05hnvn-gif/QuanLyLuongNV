@@ -99,23 +99,6 @@ def add_salary(request):
         return redirect('payroll:view_salary')
     return render(request, 'add_salary.html')
 
-def edit_salary(request):
-    if request.method == 'POST':
-        salary_id = request.POST.get('salary_id')
-        rank = request.POST.get('salary_rank')
-        amount = request.POST.get('amount')
-        multiplier = request.POST.get('multiplier')
-
-        cursor = conn.cursor(DictCursor)
-        cursor.execute(
-            "UPDATE salary SET salary_rank=%s, amount=%s, multiplier=%s WHERE salary_id=%s",
-            (rank, amount, multiplier, salary_id)
-        )
-        conn.commit()
-        cursor.close()
-
-    return redirect('payroll:view_salary')
-
 def view_history_salary(request):
     if request.method=='POST':
         history_id=request.POST.get('history_id')
