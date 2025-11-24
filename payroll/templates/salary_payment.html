@@ -74,7 +74,7 @@
                             <p><strong>Nhân viên:</strong> {{ s.username }}</p>
                             <p><strong>Chức vụ:</strong> {{ s.rank }}</p>
                             <p><strong>Hệ số lương:</strong> {{ s.multiplier }}</p>
-                            <p><strong>Tiền phạt:</strong> {{ s.total_salary|floatformat:1 }}</p>
+                            <p><strong>Tiền phạt (số buổi không phép):</strong> {{ s.penalty_money|floatformat:1 }}({{ s.penalty }})</p>
                             <p><strong>Thành tiền:</strong> {{ s.total_salary|floatformat:1 }}</p>
 
                             {% if s.is_paid %}
@@ -90,6 +90,7 @@
                                 <input type="hidden" name="staff_id" value="{{ s.id }}">
                                 <input type="hidden" name="salary_id" value="{{ s.salary_id }}">
                                 <input type="hidden" name="total_amount" value="{{ s.total_salary }}">
+                                <input type="hidden" name="penalty_money" value="{{ s.penalty_money }}">
                                 <input type="hidden" name="month" value="{{ selected_month }}">
                                 <button type="submit">Thanh toán</button>
                             </form>

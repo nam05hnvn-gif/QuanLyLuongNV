@@ -122,7 +122,6 @@ def view_history_salary(request):
 
 def salary_payment(request):
     status = request.GET.get("status")
-
     cursor=conn.cursor(DictCursor)
     if request.method=='POST':
         status = request.GET.get('status', '')
@@ -130,6 +129,7 @@ def salary_payment(request):
         month=request.POST.get('month')
         admin_id=request.session.get('user_id')
         total_amount=request.POST.get('total_amount')
+        penalty_amount=request.POST.get('penalty_money')
         salary_id = request.POST.get('salary_id')
         payment_datetime = datetime.datetime.strptime(month + "-15 0:0:00", "%Y-%m-%d %H:%M:%S")
 
@@ -138,11 +138,12 @@ def salary_payment(request):
         max_id = result['max_id'] if result['max_id'] is not None else 0
         new_payment_id = max_id + 1
 
+        new_amount=float(total_amount)-float(penalty_amount)
         cursor.execute('''
             INSERT INTO salarypayment(
                 staff_id, total_amount, admin_id, salary_id, payment_date, payment_id
             ) VALUES (%s, %s, %s, %s, %s, %s)
-        ''', (staff_id, total_amount, admin_id, salary_id, payment_datetime, new_payment_id))
+        ''', (staff_id, new_amount, admin_id, salary_id, payment_datetime, new_payment_id))
         conn.commit()
         redirect_url = f"{reverse('payroll:salary_payment')}?month={month}"
         if status:
@@ -157,7 +158,17 @@ def salary_payment(request):
     s1.id, s1.username, s2.salary_id, s2.rank, s2.amount, s2.multiplier,
     COALESCE(sp.total_amount, s2.amount * s2.multiplier) AS total_salary,
     sp.payment_date,
-    CASE WHEN sp.payment_date IS NOT NULL THEN 1 ELSE 0 END AS is_paid
+    CASE WHEN sp.payment_date IS NOT NULL THEN 1 ELSE 0 END AS is_paid,
+    (SELECT COUNT(*)*1000 FROM leavedetail l
+        WHERE l.staff_id = s.staff_id
+          AND status = 'rejected'
+          AND DATE_FORMAT(l.leavedetail_date, '%%Y-%%m') = %s
+       ) AS penalty_money,
+       (SELECT COUNT(*) FROM leavedetail l
+        WHERE l.staff_id = s.staff_id
+          AND status = 'rejected'
+          AND DATE_FORMAT(l.leavedetail_date, '%%Y-%%m') = %s
+       ) AS penalty
     FROM staffprofile s
     JOIN person s1 ON s.staff_id = s1.id
     JOIN salary s2 ON s.salary_id = s2.salary_id
@@ -165,7 +176,7 @@ def salary_payment(request):
         ON sp.staff_id = s.staff_id
        AND DATE_FORMAT(sp.payment_date, '%%Y-%%m') = %s
     '''
-    params = [select_month]
+    params = [select_month,select_month,select_month]
     # Lọc theo trạng thái
     if status == "paid":
         query += " WHERE sp.payment_date IS NOT NULL"
