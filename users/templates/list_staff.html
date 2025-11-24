@@ -1,132 +1,91 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Dashboard - Quản lý Nhân viên</title>
-    <style>
-        /* CSS CŨ CỦA BẠN */
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
-        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        h1 { color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
-        .action-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .add-button { background-color: #28a745; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; }
-        .add-button:hover { background-color: #218838; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #ddd; padding: 12px 8px; text-align: left; }
-        th { background-color: #007bff; color: white; }
-        tr:nth-child(even) { background-color: #f9f9f9; }
-        .return-button { background-color: #ffc107; color: #333; padding: 8px 15px; text-decoration: none; border-radius: 5px; }
-        .return-button:hover { background-color: #cb9a06;}
-        
-        .btn {
-            display: inline-block;
-            text-decoration: none;
-            cursor: pointer;
-            border: 1px solid transparent;
-            border-radius: 4px;
-            transition: background-color 0.3s ease;
-        }
+{% extends "base_admin.html" %}
 
-        /* Định nghĩa kích thước nhỏ (btn-sm) */
-        .btn-sm {
-            padding: 5px 10px;
-            font-size: 14px;
-            margin-right: 5px; /* Tạo khoảng cách giữa nút Sửa và Xóa */
-        }
+{% block extra_css %}
+<style>
+    /* Chuyển các style CSS đã viết vào đây hoặc tốt hơn là file CSS ngoài */
+    .container { max-width: 1200px; margin: auto; padding: 20px; border-radius: 8px; }
+    h1 { color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
+    .action-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .add-button { background-color: #28a745; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; }
+    .add-button:hover { background-color: #218838; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { border: 1px solid #ddd; padding: 12px 8px; text-align: left; }
+    th { background-color: #007bff; color: white; }
+    tr:nth-child(even) { background-color: #f9f9f9; }
+    /* Giữ nguyên các class btn, btn-sm, btn-primary, btn-danger */
+    .btn { display: inline-block; text-decoration: none; cursor: pointer; border: 1px solid transparent; border-radius: 4px; transition: background-color 0.3s ease; }
+    .btn-sm { padding: 5px 10px; font-size: 14px; margin-right: 5px; }
+    .btn-primary { color: white; background-color: #007bff; border-color: #007bff; }
+    .btn-primary:hover:not(.disabled) { background-color: #0056b3; border-color: #0056b3; }
+    .btn-danger { color: white; background-color: #dc3545; border-color: #dc3545; }
+    .btn-danger:hover:not(.disabled) { background-color: #bd2130; border-color: #bd2130; }
+    .return-button { background-color: #ffc107; color: #333; padding: 8px 15px; text-decoration: none; border-radius: 5px; }
+    .return-button:hover { background-color: #cb9a06;}
+</style>
+{% endblock extra_css %}
 
-        /* Định nghĩa màu cho nút Sửa (btn-primary) */
-        .btn-primary {
-            color: white;
-            background-color: #007bff;
-            border-color: #007bff;
-        }
 
-        /* Hiệu ứng hover cho nút Sửa */
-        .btn-primary:hover:not(.disabled) {
-            background-color: #0056b3;
-            border-color: #0056b3;
-        }
-
-        /* Định nghĩa màu cho nút Xóa (btn-danger) */
-        .btn-danger {
-            color: white;
-            background-color: #dc3545;
-            border-color: #dc3545;
-        }
-
-        /* Hiệu ứng hover cho nút Xóa */
-        .btn-danger:hover:not(.disabled) {
-            background-color: #bd2130;
-            border-color: #bd2130;
-        }
-
-        /* Làm mờ nút bị vô hiệu hóa (disabled) */
-        .disabled {
-            opacity: 0.65;
-            cursor: not-allowed;
-        }
-
-    </style>
-</head>
-<body>
-    <div class="container">
-        
-        <div class="action-bar">
-            <h1>Quản lý Nhân viên</h1>
-            <div>
-                <a href="{% url 'users:admin_dashboard' %}" class="return-button">Quay về dashboard</a>
-            </div>
+{% block admin_content %}
+<div class="container">
+    
+    <div class="action-bar">
+        <h1>Quản lý Nhân viên</h1>
+        {# Nút này có thể không cần nếu dashboard đã có trong menu của base_admin #}
+        <div>
+            <a href="{% url 'users:admin_dashboard' %}" class="return-button">Quay về dashboard</a>
         </div>
-
-        <div class="action-bar">
-            <h2>Danh sách Nhân viên ({{ staff_list|length }} người)</h2>
-            <a href="{% url 'users:add_staff' %}" class="add-button">+ Thêm nhân viên mới</a>
-        </div>
-
-        {% if staff_list %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Username</th>
-                        <th>Giới tính</th>
-                        <th>Ngày vào</th>
-                        <th>Ngày sinh</th>
-                        <th>Bậc lương</th>
-                        <th>Lương cơ bản</th>
-                        <th>Hệ số</th>
-                        <th>Thao tác</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for staff in staff_list %}
-                    <tr>
-                        <td>{{ staff.id }}</td>
-                        <td>{{ staff.username }}</td>
-                        <td>{{ staff.gender }}</td>
-                        <td>{{ staff.start_date|date:"Y-m-d" }}</td>
-                        <td>{{ staff.birth_date|date:"Y-m-d" }}</td>
-                        <td>{{ staff.rank }}</td>
-                        <td>{{ staff.amount|floatformat:0 }} VNĐ</td>
-                        <td>{{ staff.multiplier }}</td>
-
-                        <td>
-                            <a href="{% url 'users:admin_edit_staff' staff_id=staff.id %}" class="btn btn-sm btn-primary">Sửa</a>
-                            
-                            <a href="{% url 'users:delete_staff' staff_id=staff.id %}" 
-                            class="btn btn-sm btn-danger"
-                            onclick="return confirm('Xác nhận xóa nhân viên {{ staff.username }} (ID: {{ staff.id }})? Hành động này không thể hoàn tác!');">
-                                Xóa
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p style="color: gray;">Chưa có nhân viên nào trong hệ thống, hoặc có lỗi truy vấn dữ liệu.</p>
-        {% endif %}
-
     </div>
-</body>
-</html>
+
+    <div class="action-bar">
+        <h2>Danh sách Nhân viên ({{ staff_list|length }} người)</h2>
+        <a href="{% url 'users:add_staff' %}" class="add-button">+ Thêm nhân viên mới</a>
+    </div>
+
+    {% if staff_list %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Giới tính</th>
+                    <th>Ngày vào</th>
+                    <th>Ngày sinh</th>
+                    <th>Bậc lương</th>
+                    <th>Lương cơ bản</th>
+                    <th>Hệ số</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for staff in staff_list %}
+                <tr>
+                    <td>{{ staff.id }}</td>
+                    <td>{{ staff.username }}</td>
+                    <td>{{ staff.gender }}</td>
+                    <td>{{ staff.start_date|date:"Y-m-d" }}</td>
+                    <td>{{ staff.birth_date|date:"Y-m-d" }}</td>
+                    <td>{{ staff.rank }}</td>
+                    <td>{{ staff.amount|floatformat:0 }} VNĐ</td>
+                    <td>{{ staff.multiplier }}</td>
+
+                    <td>
+                        {# Dùng URL đã được tối ưu: users:admin_edit_staff #}
+                        <a href="{% url 'users:admin_edit_staff' staff_id=staff.id %}" class="btn btn-sm btn-primary">Sửa</a>
+                        
+                        {# Dùng URL đã được tối ưu: users:delete_staff #}
+                        <a href="{% url 'users:delete_staff' staff_id=staff.id %}" 
+                        class="btn btn-sm btn-danger"
+                        onclick="return confirm('Xác nhận xóa nhân viên {{ staff.username }} (ID: {{ staff.id }})? Hành động này không thể hoàn tác!');">
+                            Xóa
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p style="color: gray;">Chưa có nhân viên nào trong hệ thống, hoặc có lỗi truy vấn dữ liệu.</p>
+    {% endif %}
+
+</div>
+{% endblock admin_content %}

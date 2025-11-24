@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.db import connection, transaction
 from django.utils import timezone
 from datetime import date, datetime
+from zoneinfo import ZoneInfo
 
 def index(request):
     if 'user_id' in request.session:
@@ -106,6 +107,15 @@ def add_staff_view(request):
     
     admin_id = request.session['user_id']
 
+    # Truy vấn bậc lương
+    salary_ranks = []
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT salary_id, rank FROM salary ORDER BY CAST(salary_id AS UNSIGNED)")
+            salary_ranks = [dict(zip([col[0] for col in cursor.description], row)) for row in cursor.fetchall()]
+    except Exception as e:
+        print(f"Lỗi truy vấn bậc lương: {e}")
+
     if request.method == 'POST':
         username   = request.POST.get('username')
         password   = request.POST.get('password')
@@ -166,14 +176,14 @@ def add_staff_view(request):
                         admin_id,
                         new_id,
                         "Thêm nhân viên mới",
-                        timezone.now()
+                        timezone.now().astimezone(ZoneInfo("Asia/Ho_Chi_Minh"))
                     ])
                 return redirect('users:list_staff')
         except Exception as e:
             error = f"Lỗi khi thêm nhân viên: {e}"
-            return render(request, 'add_staff.html', {'error': error})
+            return render(request, 'add_staff.html', {'error': error,  'salary_ranks': salary_ranks})
 
-    return render(request, 'add_staff.html', {})
+    return render(request, 'add_staff.html', {'salary_ranks': salary_ranks})
 
 def admin_edit_staff_view(request, staff_id):
     if 'user_id' not in request.session or request.session.get('user_role') != 'Admin':
@@ -286,7 +296,7 @@ def admin_edit_staff_view(request, staff_id):
                             admin_id, staff_id, new_salary_id,
                             old_amount, new_amount,
                             old_multiplier, new_multiplier,
-                            timezone.now()
+                            timezone.now().astimezone(ZoneInfo("Asia/Ho_Chi_Minh"))
                         ])
                         
             return redirect('users:list_staff') 
