@@ -7,16 +7,33 @@ def _dict_from_cursor(cursor):
     return [dict(zip(cols, row)) for row in rows]
 
 
-def list_funds():
-    try:
-        with connection.cursor() as cur:
-            cur.execute('''
-                SELECT * FROM fund
-                ORDER BY fund_id ASC
-            ''')
+def list_funds(search, sort="fund_id", order="asc"):
+        try:
+            cur = connection.cursor()
+
+            query = "SELECT * FROM fund WHERE 1=1"
+            params = []
+
+            if not search == "":
+                query += " AND fund_id = %s"
+                params.append(f"{int(search)}")
+
+            valid_sort_columns = ["fund_id", "fund_amount"]
+            if sort not in valid_sort_columns:
+                sort = "fund_id"
+
+            order = "asc" if order.lower() == "asc" else "desc"
+
+            query += f" ORDER BY {sort} {order}"
+
+            cur.execute(query, params)
             return _dict_from_cursor(cur)
-    except Exception as e:
-        return {"error" : str(e)}
+
+        except Exception as e:
+            return {"error": str(e)}
+
+        finally:
+            cur.close()
     
 def get_fund_by_id(fund_id):
     try:
@@ -70,7 +87,7 @@ def change_fund(data):
             if exists == 0:
                 break
     fund_id = int(data.get('fund_id'))
-    admin_id = int(data.get('admin_id'))
+    admin_id = data.get('admin_id')
     with connection.cursor() as cur:
         old_amount = 0
         cur.execute(

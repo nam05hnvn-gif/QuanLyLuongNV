@@ -1,0 +1,47 @@
+{% extends "base_staff.html" %}
+
+{% block staff_content %}
+    <div style="max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px;">
+        <h2>Hồ sơ cá nhân</h2>
+        <hr>
+        
+        {% if profile %}
+            <div style="margin-bottom: 15px;">
+                <strong>Mã nhân viên (ID):</strong> {{ profile.id }}
+            </div>
+            <div style="margin-bottom: 15px;">
+                <strong>Tên đăng nhập:</strong> {{ profile.username }}
+            </div>
+            <div style="margin-bottom: 15px;">
+                <strong>Chức vụ:</strong> {{ profile.role }}
+            </div>
+            <div style="margin-bottom: 15px;">
+                <strong>Giới tính:</strong> {{ profile.gender }}
+            </div>
+            <div style="margin-bottom: 15px;">
+                <strong>Ngày sinh:</strong> {{ profile.birth_date|date:"d/m/Y" }}
+            </div>
+            <div style="margin-bottom: 15px;">
+                <strong>Ngày vào làm:</strong> {{ profile.start_date|date:"d/m/Y" }}
+            </div>
+            
+            <h3 style="margin-top: 30px; border-top: 1px dashed #ddd; padding-top: 15px;">Thông tin Lương</h3>
+            <div style="margin-bottom: 15px;">
+                <strong>Bậc lương:</strong> {{ profile.rank }}
+            </div>
+            <div style="margin-bottom: 15px;">
+                <strong>Lương cơ bản (Amount):</strong> {{ profile.amount|floatformat:0 }} VNĐ
+            </div>
+            <div style="margin-bottom: 15px;">
+                <strong>Hệ số:</strong> {{ profile.multiplier }}
+            </div>
+            
+        {% else %}
+            <p style="color: red;">Không thể tải dữ liệu hồ sơ cá nhân. Vui lòng thử lại.</p>
+        {% endif %}
+
+        <a href="{% url 'users:edit_profile' %}" style="background-color: #007bff; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; margin-top: 20px; display: inline-block;">
+            Chỉnh sửa Hồ sơ
+        </a>
+    </div>
+{% endblock staff_content %}

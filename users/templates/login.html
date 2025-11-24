@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng nhập</title>
+    <style>
+        /* 1. Thiết lập chung */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7f6; /* Màu nền nhẹ nhàng */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* 2. Thiết lập Container Form */
+        .login-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Tạo bóng đổ nhẹ */
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+        }
+
+        /* 3. Tiêu đề */
+        h2 {
+            color: #333;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        /* 4. Nhãn (Label) */
+        label {
+            display: block; /* Nhãn chiếm toàn bộ chiều rộng */
+            text-align: left;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+
+        /* 5. Ô nhập liệu (Input) */
+        input[type="text"], 
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box; /* Quan trọng để padding không làm tăng chiều rộng */
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, 
+        input[type="password"]:focus {
+            border-color: #007bff; /* Thay đổi màu viền khi focus */
+            outline: none;
+        }
+
+        /* 6. Nút Đăng nhập */
+        button[type="submit"] {
+            background-color: #007bff; /* Màu xanh dương nổi bật */
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3; /* Màu đậm hơn khi di chuột qua */
+        }
+
+        /* 7. Thông báo Lỗi */
+        .error-message {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #ffe5e5; /* Nền đỏ nhạt */
+            border: 1px solid #ff3333;
+            color: #cc0000;
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+        
+        /* 8. Liên kết khác */
+        .other-link {
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+
+        .other-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Đăng nhập Hệ thống</h2>
+        
+        <form method="post">
+            {% csrf_token %} 
+            <label for="username">Tên đăng nhập:</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Mật khẩu:</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit">Đăng nhập</button>
+        </form>
+        
+        {% if error %}
+            <p class="error-message">Lỗi: {{ error }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>

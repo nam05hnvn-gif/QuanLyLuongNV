@@ -1,15 +1,16 @@
 {% extends "base.html" %}
 
 {% block sidebar %}
-    <a href="base_staff.html">Trang chủ</a>
+    <a href="{% url 'users:staff_dashboard' %}">Trang chủ</a>
     <hr style="border-top: 1px solid #555;">
 
-    <a href="base_staff.html">Hồ sơ cá nhân</a>
-    <a href="base_staff.html">Lịch sử Trả lương</a>
-    <a href="base_staff.html">Lịch Nghỉ & Công</a>
-    <a href="base_staff.html">Đổi mật khẩu</a>
+    <a href="{% url 'users:profile' %}">Hồ sơ cá nhân</a>
+    <a href="{% url 'users:salary_history' %}">Lịch sử Trả lương</a>
+    <a href="{% url 'users:leave_history' %}">Lịch Nghỉ & Công</a>
+    <a href="{%url 'users:change_password' %}">Đổi mật khẩu</a>
+    <a href="{% url 'attendance:staff_attendance' %}">Lịch Nghỉ & Công</a>
     <hr style="border-top: 1px solid #555;">
-    <a href="base_staff.html">Đăng nhập</a>
+    <a href="{% url 'users:logout' %}">Đăng xuất</a>
 {% endblock %}
 
 {% block content %}

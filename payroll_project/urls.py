@@ -9,8 +9,8 @@ urlpatterns = [
     path('', index, name='home'),
 
     # KẾT NỐI CÁC APP CON 
-    #path('users/', include('users.urls', namespace='users')),
+    path('users/', include('users.urls', namespace='users')),
     path('payroll/', include('payroll.urls', namespace='payroll')),
-    #path('attendance/', include('attendance.urls', namespace='attendance')),
+    path('attendance/', include('attendance.urls', namespace='attendance')),
     path('funds/', include('funds.urls', namespace='funds')),
 ]

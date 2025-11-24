@@ -1,0 +1,136 @@
+{% extends "base_admin.html" %}
+
+{% block extra_css %}
+<style>
+    /* Chỉ giữ lại CSS cấu trúc và kiểu dáng cụ thể cho form này */
+    body {
+        /* Đã được định nghĩa trong base_admin, không cần thiết ở đây */
+        /* background-color: #f4f7f6; margin: 0; padding: 20px; */
+        display: flex; 
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .container {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 450px;
+        /* Thêm margin-top để căn giữa dọc tốt hơn trong khối admin_content */
+        margin-top: 50px; 
+    }
+
+    h1 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #555;
+    }
+
+    input[type="text"], 
+    input[type="password"], 
+    input[type="date"],
+    select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    button {
+        background-color: #007bff;
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 100%;
+        font-size: 16px;
+        transition: background-color 0.3s;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+    
+    .back-button {
+        display: inline-block;
+        margin-bottom: 20px;
+        padding: 10px 15px;
+        background-color: #6c757d;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+    }
+    
+    .back-button:hover {
+        background-color: #5a6268;
+    }
+
+    .error-message {
+        color: white;
+        background-color: #dc3545;
+        padding: 10px;
+        border-radius: 4px;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+</style>
+{% endblock extra_css %}
+
+
+{% block admin_content %}
+<div class="container">
+    
+    <a href="{% url 'users:list_staff' %}" class="back-button">← Quay lại Quản lý Nhân viên</a>
+    
+    <h1>Thêm Nhân Viên Mới</h1>
+
+    {% if error %}
+        <p class="error-message">{{ error }}</p>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <label for="username">Tên đăng nhập:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="password">Mật khẩu:</label>
+        <input type="password" id="password" name="password" required>
+
+        <label for="gender">Giới tính:</label>
+        <select id="gender" name="gender" required>
+            <option value="Male">Nam</option>
+            <option value="Female">Nữ</option>
+            {# Bổ sung option 'Other' nếu cần thiết #}
+            <option value="Other">Khác</option>
+        </select>
+        
+        <label for="birth_date">Ngày sinh:</label>
+        <input type="date" id="birth_date" name="birth_date" required>
+
+        <label for="salary_id">Bậc lương:</label>
+        <select id="salary_id" name="salary_id" required>
+            {% for rank in salary_ranks %}
+                <option value="{{ rank.salary_id }}">{{ rank.rank }}</option>
+            {% empty %}
+                <option value="">Không có bậc lương</option>
+            {% endfor %}
+        </select>
+        
+        <button type="submit">Thêm Nhân Viên</button>
+    </form>
+</div>
+{% endblock admin_content %}

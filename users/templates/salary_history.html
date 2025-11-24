@@ -1,0 +1,80 @@
+{% extends "base_staff.html" %}
+
+{% block extra_css %}
+<style>
+    /* CSS cho Bảng Lịch sử Lương */
+    .history-container {
+        padding: 20px;
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    h2 {
+        color: #007bff;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: left;
+    }
+    th {
+        background-color: #007bff;
+        color: white;
+        font-weight: bold;
+    }
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+    .text-right {
+        text-align: right;
+    }
+    .no-data {
+        padding: 20px;
+        text-align: center;
+        color: #6c757d;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        border: 1px solid #dee2e6;
+    }
+</style>
+{% endblock extra_css %}
+
+{% block staff_content %}
+<div class="history-container">
+    <h2>Lịch sử Thanh toán Lương</h2>
+    
+    {% if payment_history %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID Thanh toán</th>
+                    <th>Ngày Thanh toán</th>
+                    <th>Lương</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in payment_history %}
+                <tr>
+                    <td>{{ payment.payment_id }}</td>
+                    <td>{{ payment.payment_date|date:"d/m/Y" }}</td>
+                    <td class="text-right">{{ payment.total_amount|floatformat:0 }} VNĐ</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="no-data">
+            Chưa có lịch sử thanh toán lương nào được ghi nhận.
+        </div>
+    {% endif %}
+
+</div>
+{% endblock staff_content %}

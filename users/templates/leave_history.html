@@ -1,0 +1,55 @@
+{% extends "base_staff.html" %}
+
+{% block extra_css %}
+<style>
+    /* CSS đã cung cấp trước đó (Giữ nguyên) */
+    .history-container { padding: 20px; background: #ffffff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    h2 { color: #007bff; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; vertical-align: top; }
+    th { background-color: #007bff; color: white; font-weight: bold; }
+    tr:nth-child(even) { background-color: #f9f9f9; }
+    .no-data { padding: 20px; text-align: center; color: #6c757d; background-color: #f8f9fa; border-radius: 4px; border: 1px solid #dee2e6; }
+    .status-Approved { color: white; background-color: #28a745; padding: 4px 8px; border-radius: 4px; font-weight: bold; display: inline-block; }
+    .status-Pending { color: #333; background-color: #ffc107; padding: 4px 8px; border-radius: 4px; font-weight: bold; display: inline-block; }
+    .status-Rejected { color: white; background-color: #dc3545; padding: 4px 8px; border-radius: 4px; font-weight: bold; display: inline-block; }
+</style>
+{% endblock extra_css %}
+
+{% block staff_content %}
+<div class="history-container">
+    <h2>Lịch sử Nghỉ phép (Theo Ngày)</h2>
+    
+    {% if leave_requests %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID Chi tiết</th>
+                    <th>Ngày Nghỉ</th>
+                    <th>Lý do</th>
+                    <th>Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in leave_requests %}
+                <tr>
+                    <td>{{ req.detail_id }}</td>
+                    <td>{{ req.leave_date|date:"d/m/Y" }}</td>
+                    <td>{{ req.reason }}</td>
+                    <td>
+                        <span class="status-{{ req.status }}">
+                            {{ req.status }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="no-data">
+            Bạn chưa có yêu cầu nghỉ phép nào trong hệ thống.
+        </div>
+    {% endif %}
+
+</div>
+{% endblock staff_content %}

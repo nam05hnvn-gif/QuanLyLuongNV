@@ -1,0 +1,55 @@
+{% extends "base_staff.html" %}
+
+{% block staff_content %}
+    <div style="max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px;">
+        <h2 style="text-align: center;">Chỉnh sửa Hồ sơ cá nhân</h2>
+        <hr>
+        
+        {% if error %}
+            <p style="color: red; text-align: center;">{{ error }}</p>
+        {% endif %}
+        
+        <form method="POST" action="{% url 'users:edit_profile' %}">
+            {% csrf_token %}
+            
+            {% if profile %}
+                <div style="margin-bottom: 15px;">
+                    <strong>Mã nhân viên (ID):</strong> {{ profile.id }}
+                </div>
+
+                <label for="username" style="display: block; margin-bottom: 5px; font-weight: bold;">Tên đăng nhập:</label>
+                <input type="text" id="username" name="username" 
+                       value="{{ profile.username }}" 
+                       style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px;" required><br>
+
+                <label for="gender" style="display: block; margin-bottom: 5px; font-weight: bold;">Giới tính:</label>
+                <select id="gender" name="gender" 
+                        style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px;" required>
+                    <option value="Male" {% if profile.gender == 'Male' %}selected{% endif %}>Nam</option>
+                    <option value="Female" {% if profile.gender == 'Female' %}selected{% endif %}>Nữ</option>
+                </select><br>
+
+                <label for="birth_date" style="display: block; margin-bottom: 5px; font-weight: bold;">Ngày sinh:</label>
+                <input type="date" id="birth_date" name="birth_date" 
+                       value="{{ profile.birth_date|date:'Y-m-d' }}" 
+                       style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px;" required><br>
+
+                <div style="margin-bottom: 15px; color: #777;">
+                    * Lưu ý: Các thông tin về Lương và Chức vụ không thể chỉnh sửa tại đây.
+                </div>
+                
+                <button type="submit" 
+                        style="background-color: #28a745; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; display: block; width: 100%;">
+                    Lưu thay đổi
+                </button>
+            {% else %}
+                <p style="text-align: center;">Không tìm thấy dữ liệu hồ sơ để chỉnh sửa.</p>
+            {% endif %}
+
+        </form>
+        
+        <a href="{% url 'users:profile' %}" style="display: block; text-align: center; margin-top: 20px; color: #007bff; text-decoration: none;">
+            ← Hủy và Quay lại Hồ sơ
+        </a>
+    </div>
+{% endblock staff_content %}

@@ -7,13 +7,24 @@ from . import DAO
 
 
 def index(request):
-    res = DAO.list_funds()
+    search = request.GET.get('search', '').strip()
+    sort = request.GET.get('sort', 'fund_id')              
+    order = request.GET.get('order', 'asc')        
+
+    res = DAO.list_funds(search=search, sort=sort, order=order)
+
     if isinstance(res, dict) and res.get('error'):
         messages.error(request, f"DB error: {res.get('error')}")
         funds = []
     else:
         funds = res
-    return render(request, 'funds/index.html', {'funds': funds})
+
+    return render(request, 'funds/index.html', {
+        'funds': funds,
+        'search': search,
+        'sort': sort,
+        'order': order,
+    })
 
 
 def add_funds(request):
