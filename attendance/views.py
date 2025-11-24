@@ -1,8 +1,11 @@
+from csv import DictReader
+
 from django.shortcuts import render, redirect
 import pymysql.cursors
 from django.conf import settings
 import datetime
 
+from pymysql.cursors import DictCursor
 
 # --- KẾT NỐI DATABASE ---
 conn_settings = settings.DATABASES['default']
@@ -50,11 +53,10 @@ def admin_leave(request):
         cursor.execute("""
             SELECT ld.detail_id, ld.reason, ld.status,
                    p.username AS staff_name,
-                   l.leave_date
+                   ld.leavedetail_date
             FROM leavedetail ld
-            JOIN `leave` l ON ld.leave_id = l.leave_id
             JOIN person p ON ld.staff_id = p.id
-            ORDER BY l.leave_date DESC
+            ORDER BY ld.leavedetail_date DESC
         """)
         details = cursor.fetchall()
 
@@ -111,7 +113,7 @@ def admin_leave(request):
 
 
 def staff_attendance(request):
-    staff_id = request.session.get('staff_id')
+    staff_id = request.session.get('user_id')
     if not staff_id:
         return redirect('users:login')
 
@@ -157,7 +159,6 @@ def staff_attendance(request):
         "today": today,
         "checked_in": checked_in
     })
-
 
 
 

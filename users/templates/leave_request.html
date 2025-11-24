@@ -1,0 +1,26 @@
+{% extends "base_staff.html" %}
+
+{% block title %}Nhập ngày nghỉ phép{% endblock %}
+
+{% block content %}
+<h2>Nhập ngày nghỉ phép của nhân viên</h2>
+
+{% if done_request == 1 %}
+    <p style="color:green;">Yêu cầu nghỉ phép đã được gửi thành công!</p>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    <div>
+        <label for="leave_date">Ngày nghỉ:</label>
+        <input type="date" id="leave_date" name="leave_date" required>
+    </div>
+
+    <div>
+        <label for="reason">Lý do nghỉ:</label>
+        <input type="text" id="reason" name="reason" placeholder="Nhập lý do nghỉ (tùy chọn)">
+    </div>
+
+    <button type="submit">Gửi</button>
+</form>
+{% endblock %}

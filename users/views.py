@@ -562,3 +562,24 @@ def change_password_view(request):
     }
     return render(request, 'change_password.html', context)
 
+
+def leave_request(request):
+    if request.method=='POST':
+        staff_id=request.session.get('user_id')
+        leave_date=request.POST.get('leave_date')
+        reason=request.POST.get('reason')
+        status='pending'
+        done_request=0
+        with conn.cursor(DictCursor) as cursor:
+            cursor.execute('SELECT MAX(detail_id) AS max_id FROM leavedetail')
+            row = cursor.fetchone()
+            new_id = (row['max_id'] or 0) + 1
+
+            cursor.execute('''
+                insert into leavedetail (detail_id, staff_id, reason, status, leavedetail_date)
+                values (%s, %s, %s, %s, %s)
+            ''', (new_id, staff_id, reason, status, leave_date))
+            conn.commit()
+            done_request=1
+        return render(request, 'leave_request.html', { 'done_request':done_request })
+    return render(request, 'leave_request.html')
