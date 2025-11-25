@@ -9,6 +9,17 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <div>
+    {% if messages %}
+    <div class="container mt-2">
+        {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
 
     <h2>Bảng Thanh Toán Lương</h2>
 
@@ -66,36 +77,39 @@
                         <div class="modal-content">
 
                           <div class="modal-header">
-                            <h5>Chi tiết thanh toán</h5>
-                            <button type="button" data-bs-dismiss="modal">&times;</button>
+                            <h5 class="modal-title">Chi tiết thanh toán</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                           </div>
 
                           <div class="modal-body">
                             <p><strong>Nhân viên:</strong> {{ s.username }}</p>
                             <p><strong>Chức vụ:</strong> {{ s.rank }}</p>
                             <p><strong>Hệ số lương:</strong> {{ s.multiplier }}</p>
-                            <p><strong>Tiền phạt (số buổi không phép):</strong> {{ s.penalty_money|floatformat:1 }}({{ s.penalty }})</p>
+                            <p><strong>Tiền phạt:</strong> {{ s.penalty_money|floatformat:1 }} ({{ s.penalty }})</p>
                             <p><strong>Thành tiền:</strong> {{ s.total_salary|floatformat:1 }}</p>
 
                             {% if s.is_paid %}
                                 <p><strong>Ngày thanh toán:</strong> {{ s.payment_date|date:"d/m/Y" }}</p>
                                 <p><strong>Người duyệt:</strong> {{ admin_id }}</p>
+                            {% else %}
+                                <!-- Form thanh toán -->
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="staff_id" value="{{ s.id }}">
+                                    <input type="hidden" name="salary_id" value="{{ s.salary_id }}">
+                                    <input type="hidden" name="total_amount" value="{{ s.total_salary }}">
+                                    <input type="hidden" name="penalty_money" value="{{ s.penalty_money }}">
+                                    <input type="hidden" name="month" value="{{ selected_month }}">
+
+                                    <input type="text" name="fund_id" class="form-control mt-2" placeholder="Nhập mã quỹ...">
+
+                                    <button type="submit" class="btn btn-primary mt-3">Thanh toán</button>
+                                </form>
                             {% endif %}
                           </div>
 
                           <div class="modal-footer">
-                            {% if not s.is_paid %}
-                            <form method="post">
-                                {% csrf_token %}
-                                <input type="hidden" name="staff_id" value="{{ s.id }}">
-                                <input type="hidden" name="salary_id" value="{{ s.salary_id }}">
-                                <input type="hidden" name="total_amount" value="{{ s.total_salary }}">
-                                <input type="hidden" name="penalty_money" value="{{ s.penalty_money }}">
-                                <input type="hidden" name="month" value="{{ selected_month }}">
-                                <button type="submit">Thanh toán</button>
-                            </form>
-                            {% endif %}
-                            <button type="button" data-bs-dismiss="modal">Đóng</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                           </div>
 
                         </div>

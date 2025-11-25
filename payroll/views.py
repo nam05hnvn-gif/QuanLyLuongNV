@@ -6,6 +6,8 @@ from django.db import connection
 from django.urls import reverse
 from pymysql.cursors import DictCursor
 from django.conf import settings
+from funds import DAO as fund_DAO
+from django.contrib import messages
 
 
 conn_settings = settings.DATABASES['default']
@@ -131,7 +133,29 @@ def salary_payment(request):
         total_amount=request.POST.get('total_amount')
         penalty_amount=request.POST.get('penalty_money')
         salary_id = request.POST.get('salary_id')
+        fund_id = request.POST.get('fund_id')
         payment_datetime = datetime.datetime.strptime(month + "-15 0:0:00", "%Y-%m-%d %H:%M:%S")
+
+        fund = fund_DAO.get_fund_by_id(fund_id)
+        if not fund:
+            messages.error(request, f"Quỹ với mã {fund_id} không tồn tại.")
+            return redirect(f"{reverse('payroll:salary_payment')}?month={month}&status={status}")
+
+        if float(fund['fund_amount']) < total_amount:
+            messages.error(request, "Quỹ không đủ tiền để thực hiện thanh toán.")
+            return redirect(f"{reverse('payroll:salary_payment')}?month={month}&status={status}")
+
+        try:
+            fund_DAO.change_fund({
+                'fund_id': fund_id,
+                'amount': total_amount,
+                'admin_id': admin_id,
+                'transaction_type': 'rut',  
+                'transaction_date': datetime.datetime.now(),
+            })
+        except Exception as e:
+            messages.error(request, f"Lỗi khi rút tiền từ quỹ: {str(e)}")
+            return redirect(f"{reverse('payroll:salary_payment')}?month={month}&status={status}")
 
         cursor.execute("SELECT MAX(payment_id) AS max_id FROM salarypayment")
         result = cursor.fetchone()
@@ -159,16 +183,16 @@ def salary_payment(request):
     COALESCE(sp.total_amount, s2.amount * s2.multiplier) AS total_salary,
     sp.payment_date,
     CASE WHEN sp.payment_date IS NOT NULL THEN 1 ELSE 0 END AS is_paid,
-    (SELECT COUNT(*)*1000 FROM leavedetail l
-        WHERE l.staff_id = s.staff_id
-          AND status = 'rejected'
-          AND DATE_FORMAT(l.leavedetail_date, '%%Y-%%m') = %s
-       ) AS penalty_money,
-       (SELECT COUNT(*) FROM leavedetail l
-        WHERE l.staff_id = s.staff_id
-          AND status = 'rejected'
-          AND DATE_FORMAT(l.leavedetail_date, '%%Y-%%m') = %s
-       ) AS penalty
+    (SELECT COUNT(*)*1000 
+        FROM leavedetail ld JOIN `leave` l ON ld.leave_id = l.leave_id
+        WHERE ld.staff_id = s.staff_id
+            AND status = 'rejected'
+            AND DATE_FORMAT(l.leave_date, '%%Y-%%m') = %s) AS penalty_money,
+    (SELECT COUNT(*) 
+        FROM leavedetail ld JOIN `leave` l ON ld.leave_id = l.leave_id
+        WHERE ld.staff_id = s.staff_id
+            AND status = 'rejected'
+            AND DATE_FORMAT(l.leave_date, '%%Y-%%m') = %s) AS penalty
     FROM staffprofile s
     JOIN person s1 ON s.staff_id = s1.id
     JOIN salary s2 ON s.salary_id = s2.salary_id
@@ -186,6 +210,7 @@ def salary_payment(request):
     cursor.execute(query, params)
     salaries=cursor.fetchall()
     if not select_month: return render(request, 'salary_payment.html', {'months':months})
+    cursor.close()
     return render(request, 'salary_payment.html', {'salaries':salaries,
                                                    'months':months,
                                                    'selected_month':select_month,

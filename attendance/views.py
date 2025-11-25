@@ -164,7 +164,7 @@ def staff_attendance(request):
 
 
 def attendance_redirect(request):
-    role = request.session.get("role")
+    role = request.session.get("user_role")
 
 
     if role == "admin":
